@@ -1,0 +1,7 @@
+<h2>Your Checklist Items</h2>
+<%= @items.each do |item| %>
+  <%= link_to item.title %>
+  <%= item.description %>
+<% end %>
+
+<%= link_to "New Item", new_item_path %>
