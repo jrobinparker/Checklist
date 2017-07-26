@@ -1,12 +1,19 @@
 class ItemsController < ApplicationController
   before_action :find_item, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, except: [:index]
 
   def index
+    if user_signed_in?
+      @items = Item.where(:user_id => current_user.id).order("created_at DESC")
+    end
+  end
+
+  def show
     @items = Item.where(:user_id => current_user.id).order("created_at DESC")
   end
 
   def new
-    @item = current_user.items.build(item_params)
+    @item = current_user.items.build
   end
 
   def create
@@ -18,13 +25,12 @@ class ItemsController < ApplicationController
     end
   end
 
-  def show
-  end
 
   def edit
   end
 
   def update
+    @item = Item.find(params[:id])
     if @item.update(item_params)
       redirect_to item_path(@item)
     else
@@ -37,6 +43,12 @@ class ItemsController < ApplicationController
     redirect_to root_path
   end
 
+  def complete
+    @item = Item.find(params[:id])
+    @item.update_attribute(:completed_at, Time.now)
+    redirect_to root_path, notice: "Congrats! Item completed!"
+  end
+
   private
 
   def item_params
@@ -46,6 +58,5 @@ class ItemsController < ApplicationController
   def find_item
     @item = Item.find(params[:id])
   end
-
 
 end
